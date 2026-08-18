@@ -22,7 +22,7 @@ module bubblesort_tb;
         // Hold reset for one clock cycles
         @(posedge clk);
         rst = 0;
-        @(negedge clk) DUT.Datapath.Regfile.x[2] = 6144; // Initialize Stack Pointer
+        @(negedge clk) DUT.Datapath.Regfile.x[2] = 6143; // Initialize Stack Pointer
 
 
     end
