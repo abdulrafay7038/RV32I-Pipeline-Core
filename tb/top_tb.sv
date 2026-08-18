@@ -18,7 +18,7 @@ module top_tb;
         $dumpvars(0, top_tb);
         clk = 0;
         rst = 1;
-        $readmemh("program.hex", DUT.Datapath.InstrMem.mem);
+        $readmemh("../program/machinecode/program.hex", DUT.Datapath.InstrMem.mem);
         // Hold reset for two clock cycles
         #20;
         rst = 0;

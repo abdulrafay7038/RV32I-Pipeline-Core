@@ -17,8 +17,8 @@ module bubblesort_tb;
         $dumpvars(0, bubblesort_tb);
         clk = 1;
         rst = 1;
-        $readmemh("bubblesort.hex", DUT.Datapath.InstrMem.mem);
-        $readmemh("datamem.hex", DUT.Datapath.DataMem.data_mem);
+        $readmemh("../program/machinecode/bubblesort.hex", DUT.Datapath.InstrMem.mem);
+        $readmemh("../program/machinecode/datamem.hex", DUT.Datapath.DataMem.data_mem);
         // Hold reset for one clock cycles
         @(posedge clk);
         rst = 0;
