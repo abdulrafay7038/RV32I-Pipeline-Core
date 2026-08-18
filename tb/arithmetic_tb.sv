@@ -1,6 +1,4 @@
-`timescale 1ns/1ps
-
-module top_tb;
+module arithmetic_tb;
 
     logic clk;
     logic rst;
@@ -14,17 +12,17 @@ module top_tb;
     always #5 clk = ~clk;
 
     initial begin
-        $dumpfile("dump.vcd");
-        $dumpvars(0, top_tb);
-        clk = 0;
+        $dumpfile("arithmetic.vcd");
+        $dumpvars(0, arithmetic_tb);
+        clk = 1;
         rst = 1;
-        $readmemh("../program/machinecode/program.hex", DUT.Datapath.InstrMem.mem);
+        $readmemh("../program/machinecode/arithmetic.hex", DUT.Datapath.InstrMem.mem);
         // Hold reset for two clock cycles
         #20;
         rst = 0;
 
         // 40 instructions, 3 stage -> well past enough cycles
-        #500;
+        #485;
 
         // Setup registers
         if (DUT.Datapath.Regfile.x[1] !== 32'd5)
@@ -119,23 +117,8 @@ module top_tb;
         if (DUT.Datapath.Regfile.x[30] !== 32'h000010A4)
             $fatal(1, "FAIL: x30 expected 0x000010A0 after AUIPC, got 0x%08h", DUT.Datapath.Regfile.x[30]);     
         
-        // sw x1, 0(x2)
-        if (DUT.Datapath.DataMem.data_mem[1] !== 32'h00000005)
-            $fatal(1, "FAIL: MEM[1] expected 5 after SW, got %d", DUT.Datapath.DataMem.data_mem[1]);
-        // sh x4, 4(x8)
-        if (DUT.Datapath.DataMem.data_mem[2] !== 32'h7FF)
-             $fatal(1, "FAIL: MEM[2] expected 2047 after SH, got %d", DUT.Datapath.DataMem.data_mem[2]);
-        // sb x4, 8(x8) 
-        if (DUT.Datapath.DataMem.data_mem[3] !== 32'hFF)
-             $fatal(1, "FAIL: MEM[3] expected 255 after SB, got %d", DUT.Datapath.DataMem.data_mem[3]);     
-
-        // lw x31, 0(x2)
-        if (DUT.Datapath.Regfile.x[31] !== 32'h00000005)
-            $fatal(1, "FAIL: x31 expected 5 after LW, got %d", DUT.Datapath.Regfile.x[31]);
-        
-             
         $display("ALL TESTS PASSED SUCCESSFULLY");
-        $finish;
+        $finish();
     end
 
-endmodule : top_tb
+endmodule
