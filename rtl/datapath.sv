@@ -47,7 +47,7 @@ module datapath (
     logic [31:0] ReadDataW;
     logic [31:0] MRD,MWD;
     logic [2:0] funct3W;
-
+    logic [3:0] WBE;
     logic FlushE;       // Flush Execute reg
     assign FlushE = Branch_taken || JumpE;
 
@@ -144,18 +144,21 @@ module datapath (
             funct3W     <= funct3;
         end
     end
-    LSU LoadStoreUnit(
+    lsu LoadStoreUnit(
         .func3(funct3W),
+        .ALUResult(ALUResultW),
         .WD(RD2W),
         .MRD(MRD),
+        .WBE(WBE),
         .RD(ReadDataW),
         .MWD(MWD)
 
     );
     data_mem DataMem (
         .CLK(CLK),
-        .A(ALUResultW),
+        .A({ALUResultW[31:2],2'b00}),
         .WE(MemWriteW),
+        .WBE(WBE),
         .WD(MWD),
         .RD(MRD)
     );
