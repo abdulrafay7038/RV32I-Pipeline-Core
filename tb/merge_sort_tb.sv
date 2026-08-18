@@ -1,4 +1,3 @@
-`timescale 1ns/1ps
 module mergesort_tb;
 
     logic clk;
@@ -13,7 +12,7 @@ module mergesort_tb;
     always #5 clk = ~clk;
 
     initial begin
-        $dumpfile("dump.vcd");
+        $dumpfile("mergesort.vcd");
         $dumpvars(0, mergesort_tb);
         clk = 1;
         rst = 1;
@@ -22,7 +21,7 @@ module mergesort_tb;
         // Hold reset for one clock cycles
         @(posedge clk);
         rst = 0;
-        @(negedge clk) DUT.Datapath.Regfile.x[2] = 6143; // Initialize Stack Pointer
+        @(negedge clk) DUT.Datapath.Regfile.x[2] = 6140; // Initialize Stack Pointer
 
 
     end
