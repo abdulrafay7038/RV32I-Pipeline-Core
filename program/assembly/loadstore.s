@@ -38,13 +38,13 @@ lui  x12, 0xABCD0
 addi x12, x12, 0x123         # x12 = 0xABCD0123
 
 sh   x12, 0(x1)              # mem[0x100] lower half = 0x0123
-sh   x12, 2(x1)              # mem[0x100] upper half = 0xABCD
+sh   x12, 2(x1)              # mem[0x100] upper half = 0x0123
 
 lh   x13, 0(x1)              # should = 0x00000123
-lh   x14, 2(x1)              # should = 0xFFFFABCD
+lh   x14, 2(x1)              # should = 0x00000123
 
 lhu  x15, 0(x1)              # should = 0x00000123
-lhu  x16, 2(x1)              # should = 0x0000ABCD
+lhu  x16, 2(x1)              # should = 0x00000123
 
 
 
