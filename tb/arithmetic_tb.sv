@@ -116,8 +116,9 @@ module arithmetic_tb;
         // AUIPC: x30 = PC + 0x1000
         if (DUT.Datapath.Regfile.x[30] !== 32'h000010A4)
             $fatal(1, "FAIL: x30 expected 0x000010A0 after AUIPC, got 0x%08h", DUT.Datapath.Regfile.x[30]);     
-        
+        $display("==========================================");
         $display("ALL TESTS PASSED SUCCESSFULLY");
+        $display("==========================================");
         $finish();
     end
 
