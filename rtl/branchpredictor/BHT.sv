@@ -1,38 +1,53 @@
-module BHT (
-    input  var logic        clk,
-    input  var logic        rst,
-    input  var logic        write,
-    input  var logic [31:0] pc1,   // PC to fetch
-    input  var logic [31:0] pc2,
-    input  var logic [31:0] inst,
-    input  var logic [ 1:0] updated_logic,
-    output var logic [ 1:0] prediction,
-    output var logic        read
+module BHT(
+    input  logic        CLK,
+    input  logic        RST,
+    input  logic        WE,
+
+    input  logic [31:0] PCF,                //PC being fetched
+    input  logic [31:0] PCE,                //PC being executed
+    input  logic [1:0]  updated_prediction, //updated prediction from counter
+
+    output logic [1:0]  predictionF,       //stored prediction for fetched pc
+    output logic        hit
 );
-    var logic [23:0] bht [0:255];
-    var logic [21:0] tag1;
-    var logic [ 7:0] index1;
-    var logic [21:0] tag2;
-    var logic [ 7:0] index2;
 
-//READ LOGIC
-    always_comb begin
-        // TODO
-    end
+    logic [24:0] bht [255:0];   //256 entries in table each 25 bit wide, 22 tag bits + 2 bits for prediction, 1 bit for valid
+    logic [7:0]  indexF;
+    logic [7:0]  indexE;
+    logic [21:0] tagF;
+    logic [21:0] tagE;
+    logic [21:0] stored_tag;
+    logic valid;
 
-//ASSIGN TAG AND INDEX
-    always_comb begin
-        // TODO
-    end
+    //Decode
+    assign tagF   = PCF[31:10];
+    assign tagE   = PCE[31:10];
+    assign indexE = PCE[9:2];
+    assign indexF = PCF[9:2];
 
-//PREDICTION
-    always_comb begin
-        // TODO
-    end 
+    assign stored_tag = bht[indexF][23:2];
+    assign valid      = bht[indexF][24];
 
-//UPDATE
-    always_ff @(posedge clk) begin
-        // TODO
+    //Write Interface
+    always_ff @(posedge CLK or posedge RST) begin
+        if (RST) begin
+            for (int i = 0; i < 256; i++) begin
+                bht[i][24]  <= 1'b0;                   //Initializing all valids to 0
+                bht[i][1:0] <= 2'b01;
+            end
+        end
+        else if (WE) begin
+            bht[indexE][1:0]   <= updated_prediction;
+            bht[indexE][23:2]  <= tagE;
+            bht[indexE][24]    <= 1'b1;
+        end
+
     end
     
+    //Read Interface
+    always_comb begin
+        predictionF    = bht[indexF][1:0];
+        hit            = (tagF == stored_tag) && valid;
+    end
+
 endmodule
