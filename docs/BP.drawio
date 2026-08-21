@@ -1,6 +1,6 @@
 <mxfile host="Electron" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/29.3.6 Chrome/140.0.7339.249 Electron/38.8.0 Safari/537.36" version="29.3.6">
   <diagram name="Page-1" id="KAAnRZJDuIUciX6P4GE6">
-    <mxGraphModel dx="1737" dy="1100" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="0" pageScale="1" pageWidth="2500" pageHeight="1500" math="0" shadow="0">
+    <mxGraphModel dx="1489" dy="943" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="0" pageScale="1" pageWidth="2500" pageHeight="1500" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -303,7 +303,7 @@
             <mxPoint x="220" y="697" as="targetPoint" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="NO1W3IPD7a5wtIToZrDD-128" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fontSize=11;fontFamily=Comic Sans MS;" value="&lt;font&gt;2 bit Counter FSM&lt;/font&gt;" vertex="1">
+        <mxCell id="NO1W3IPD7a5wtIToZrDD-128" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fontSize=11;fontFamily=Comic Sans MS;" value="&lt;font&gt;2 bit Predictor&lt;/font&gt;" vertex="1">
           <mxGeometry height="130" width="220" x="310" y="664" as="geometry" />
         </mxCell>
         <mxCell id="NO1W3IPD7a5wtIToZrDD-129" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;fontSize=11;fontFamily=Comic Sans MS;" value="next_state" vertex="1">
