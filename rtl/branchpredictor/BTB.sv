@@ -1,4 +1,4 @@
-module BTB(
+module btb(
     input  logic        CLK,
     input  logic        RST,
     input  logic        WE,   // write-enable
@@ -31,7 +31,7 @@ module BTB(
     //Write Interface
     always_ff @(posedge CLK or posedge RST) begin
         if (RST) begin
-            for (int i = 0; i < 256: i++) begin
+            for (int i = 0; i < 256; i++) begin
                 btb[i][54] <= 1'b0;                   //Initializing all valids to 0
             end
         end
