@@ -1,4 +1,4 @@
-module BHT(
+module bht(
     input  logic        CLK,
     input  logic        RST,
     input  logic        WE,
