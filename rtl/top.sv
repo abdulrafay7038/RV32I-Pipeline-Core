@@ -5,6 +5,7 @@ module top (
 
     // instruction fields sent from datapath to controller
     logic [6:0] Op;          // instruction opcode
+    logic [6:0] OpF;         // opcode of instruction being fetched
     logic [2:0] funct3;      // funct3 field for instruction decoding
     logic       funct7b5;    // instruction bit 30 for alu decoding
 
@@ -23,10 +24,11 @@ module top (
     logic [2:0] ImmSrc;      // immediate format selector
     logic [3:0] AlUControl;  // alu operation selector
     logic Branch_taken, Jump;
-
+    
     // controller: generates control signals based on instruction opcode and alu flags
     (* DONT_TOUCH = "true" *) controller Controller(
         .Op(Op),
+        .OpF(OpF),
         .funct3(funct3),
         .funct7b5(funct7b5),
         .Zero(Zero),
@@ -58,6 +60,7 @@ module top (
         .ResultSrcE(ResultSrc),
         .Branch_taken(Branch_taken),
         .JumpE(Jump),
+        .OpF(OpF),
         .Op(Op),
         .funct3(funct3),
         .funct7b5(funct7b5),

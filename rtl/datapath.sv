@@ -8,8 +8,9 @@ module datapath (
     input  logic [3:0] AlUControlE,  // alu operation control
     input  logic       MemWriteE,    // data memory write enable
     input  logic [1:0] ResultSrcE,   // select write-back data: alu result or memory data
-    input logic Branch_taken, JumpE,
+    input  logic       Branch_taken, JumpE,
 
+    output logic [6:0] OpF,         // opcode field of fetched instr sent to controller
     output logic [6:0] Op,          // opcode field sent to controller
     output logic [2:0] funct3,      // funct3 field sent to controller
     output logic       funct7b5,    // bit 30 of instruction (used for alu decoding)
@@ -24,6 +25,8 @@ module datapath (
     logic [31:0] InstrF;
     logic [31:0] PCPlus4F;
     logic [31:0] PCNextF;
+    logic [1:0]  predictionF;
+    logic [31:0] BranchPC;
 
     // internal datapath signals for EXECUTE
     logic [31:0] InstrE;
@@ -34,28 +37,46 @@ module datapath (
     logic [4:0]  RS1E, RS2E;
     logic [31:0] RD1E, RD2E;
     logic [31:0] SrcA, SrcB;
+    logic [1:0]  predictionE;
 
     // internal datapath signals for WRITE
     logic [31:0] ALUResultW;
     logic [31:0] RD2W;
     logic [4:0]  RDW;
     logic [31:0] PCPlus4W;
-    logic [1:0] ResultSrcW;
+    logic [1:0]  ResultSrcW;
     logic RegWriteW;
     logic MemWriteW;
     logic [31:0] ResultW;
     logic [31:0] ReadDataW;
     logic [31:0] MRD,MWD;
-    logic [2:0] funct3W;
-    logic [3:0] WBE;
-    logic FlushE;       // Flush Execute reg
-    assign FlushE = Branch_taken || JumpE;
+    logic [2:0]  funct3W;
+    logic [3:0]  WBE;
+    logic        FlushE;       // Flush Execute reg
+    logic        missprediction;
+    logic [1:0]  PCSrc;
+    assign missprediction = ((Op == 7'b1100011) && (predictionE[1]!= Branch_taken));
+    assign FlushE = missprediction || JumpE;
+    assign PCSrc  = (FlushE ||(OpF == 7'b1100011))? PCSrcE : 2'b00;
 
     // PC + 4 calculation
     assign PCPlus4F = PCF + 4;
     // branch/jump target address calculation
     assign PCTargetE = PCE + ImmExtE;
 
+    branch_predictor BranchPredictor(
+        .CLK(CLK),
+        .RST(RST),
+        .InstrE(InstrE),
+        .PCF(PCF),
+        .PCE(PCE),
+        .PCTargetE(PCTargetE),
+        .predictionE(predictionE),
+        .Branch_taken(Branch_taken),
+        .predictionF(predictionF),
+        .PCin(BranchPC)
+
+    );
     // program Counter register
     pc ProgramCounter (
         .CLK(CLK),
@@ -73,14 +94,16 @@ module datapath (
     //FETCH-EXECUTE Register
     always_ff @(posedge CLK) begin
     if (RST || FlushE) begin
-        InstrE   <= 32'h00000013;
-        PCE      <= 32'b0;
-        PCPlus4E <= 32'b0;
+        InstrE      <= 32'h00000013;
+        PCE         <= 32'b0;
+        PCPlus4E    <= 32'b0;
+        predictionE <= 2'b00;
     end
     else begin
-        InstrE   <= InstrF;
-        PCE      <= PCF;
-        PCPlus4E <= PCPlus4F;
+        InstrE      <= InstrF;
+        PCE         <= PCF;
+        PCPlus4E    <= PCPlus4F;
+        predictionE <= predictionF;
     end
     end
 
@@ -167,10 +190,11 @@ module datapath (
     assign SrcB   = ALUSrcE[2] ? ImmExtE   : RD2E;
     always_comb begin
         // Next PC selection
-        case(PCSrcE)
+        case(PCSrc)
             2'b00: PCNextF = PCPlus4F;
             2'b01: PCNextF = PCTargetE;
             2'b10: PCNextF = ALUResultE;
+            2'b11: PCNextF = BranchPC;    //from branch predictor
             default: PCNextF = PCPlus4F;
         endcase
         // ALU operand A selection
@@ -190,6 +214,7 @@ module datapath (
     end
 
     // instruction fields forwarded to the controller
+    assign OpF       = InstrF[6:0];
     assign Op       = InstrE[6:0];
     assign funct3   = InstrE[14:12];
     assign funct7b5 = InstrE[30];
