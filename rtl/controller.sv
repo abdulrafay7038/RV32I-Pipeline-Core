@@ -6,6 +6,7 @@ module controller (
     input  logic       Negative,    // alu sign flag for signed branch decisions
     input  logic       Overflow,    // alu overflow flag for signed branch decisions
     input  logic       Carry,       // alu carry flag for unsigned branch decisions
+    input  logic [6:0] OpF,
 
     output logic       Branch_taken,
     output logic       Jump,
@@ -30,6 +31,7 @@ module controller (
         .Negative(Negative),
         .Overflow(Overflow),
         .Carry(Carry),
+        .OpF(OpF),
 
         .Branch_taken(Branch_taken),
         .Jump(Jump),

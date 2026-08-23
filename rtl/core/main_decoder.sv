@@ -5,7 +5,7 @@ module main_decoder (
     input  logic       Negative,
     input  logic       Overflow,
     input  logic       Carry,
-
+    input  logic [6:0] OpF,
     output logic Branch_taken, Jump, 
     output logic [1:0] ResultSrc,
     output logic       MemWrite,
@@ -87,24 +87,23 @@ always_comb begin
         OP_BRANCH: begin
             ImmSrc = 3'b010;
             ALUOp  = 2'b01;
-
             case (funct3)
-                3'b000:  PCSrc = Zero                   ? 2'b01 : 2'b00;  // BEQ
-                3'b001:  PCSrc = !Zero                  ? 2'b01 : 2'b00;  // BNE
-                3'b100:  PCSrc = (Negative ^ Overflow)  ? 2'b01 : 2'b00;  // BLT
-                3'b101:  PCSrc = !(Negative ^ Overflow) ? 2'b01 : 2'b00;  // BGE
-                3'b110:  PCSrc = !Carry                 ? 2'b01 : 2'b00;  // BLTU
-                3'b111:  PCSrc = Carry                   ? 2'b01 : 2'b00; // BGEU
-                default: PCSrc = 2'b00;
+                3'b000:  Branch_taken = Zero;                     // BEQ
+                3'b001:  Branch_taken = !Zero;                   // BNE
+                3'b100:  Branch_taken = (Negative ^ Overflow);   // BLT
+                3'b101:  Branch_taken = !(Negative ^ Overflow);  // BGE
+                3'b110:  Branch_taken = !Carry;                 // BLTU
+                3'b111:  Branch_taken = Carry;                  // BGEU
+                default: Branch_taken = 1'b0;
             endcase
-            Branch_taken = PCSrc[0];
+            PCSrc  = Branch_taken? 2'b01: 2'b00;
         end
 
         // JAL
         OP_JAL: begin
-            RegWrite = 1'b1;
-            ImmSrc   = 3'b011;
-            PCSrc    = 2'b01;
+            RegWrite  =  1'b1;
+            ImmSrc    =  3'b011;
+            PCSrc     =  2'b01;
             ResultSrc = 2'b10;
             Jump = 1;
         end
@@ -128,8 +127,11 @@ always_comb begin
         default: begin
             // defaults already assigned
         end
-
     endcase
+        // Branch predictor controls PC selection for fetched branches
+        if (OpF == OP_BRANCH) begin
+            PCSrc = 2'b11;
+        end
 end
 
 endmodule : main_decoder
