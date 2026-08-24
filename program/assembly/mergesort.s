@@ -1,25 +1,3 @@
-# ============================================================
-# Recursive Merge Sort - 256 elements
-#
-# Array:
-#   base address = 0
-#   elements     = 256
-#   bytes        = 1024
-#
-# Temporary merge buffer:
-#   base address = 1024
-#
-# Calling convention:
-#   a0 = base address
-#   a1 = left index
-#   a2 = right index
-#
-# ============================================================
-
-
-        # Initialize stack
-
-
         # a0 = array base
         addi a0, x0, 0
 
