@@ -8,9 +8,11 @@ module datapath (
     input  logic [3:0] AlUControlE,  // alu operation control
     input  logic       MemWriteE,    // data memory write enable
     input  logic [1:0] ResultSrcE,   // select write-back data: alu result or memory data
-    input  logic       Branch_taken, JumpE,
-
+    input  logic       FlushE,
+    input  logic       Branch_taken,
+    
     output logic [6:0] OpF,         // opcode field of fetched instr sent to controller
+    output logic [1:0] predictionE,
     output logic [6:0] Op,          // opcode field sent to controller
     output logic [2:0] funct3,      // funct3 field sent to controller
     output logic       funct7b5,    // bit 30 of instruction (used for alu decoding)
@@ -37,7 +39,6 @@ module datapath (
     logic [4:0]  RS1E, RS2E;
     logic [31:0] RD1E, RD2E;
     logic [31:0] SrcA, SrcB;
-    logic [1:0]  predictionE;
 
     // internal datapath signals for WRITE
     logic [31:0] ALUResultW;
@@ -52,22 +53,18 @@ module datapath (
     logic [31:0] MRD,MWD;
     logic [2:0]  funct3W;
     logic [3:0]  WBE;
-    logic        FlushE;       // Flush Execute reg
-    logic        missprediction;
-    logic [1:0]  PCSrc;
-    assign missprediction = ((Op == 7'b1100011) && (predictionE[1]!= Branch_taken));
-    assign FlushE = missprediction || JumpE;
-    assign PCSrc  = (FlushE ||(OpF == 7'b1100011))? PCSrcE : 2'b00;
+
+   
 
     // PC + 4 calculation
     assign PCPlus4F = PCF + 4;
     // branch/jump target address calculation
     assign PCTargetE = PCE + ImmExtE;
 
-    branch_predictor BranchPredictor(
+    BranchPredictor BranchPredictor(
         .CLK(CLK),
         .RST(RST),
-        .InstrE(InstrE),
+        .InstE(InstrE),
         .PCF(PCF),
         .PCE(PCE),
         .PCTargetE(PCTargetE),
@@ -190,7 +187,7 @@ module datapath (
     assign SrcB   = ALUSrcE[2] ? ImmExtE   : RD2E;
     always_comb begin
         // Next PC selection
-        case(PCSrc)
+        case(PCSrcE)
             2'b00: PCNextF = PCPlus4F;
             2'b01: PCNextF = PCTargetE;
             2'b10: PCNextF = ALUResultE;

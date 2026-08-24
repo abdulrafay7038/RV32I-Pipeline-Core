@@ -6,10 +6,11 @@ module controller (
     input  logic       Negative,    // alu sign flag for signed branch decisions
     input  logic       Overflow,    // alu overflow flag for signed branch decisions
     input  logic       Carry,       // alu carry flag for unsigned branch decisions
-    input  logic [6:0] OpF,
+    input  logic [6:0] OpF,         // Opcode being fetched
+    input  logic [1:0] predictionE, // prediction made for the branch being executed
 
     output logic       Branch_taken,
-    output logic       Jump,
+    output logic       FlushE,
     output logic [1:0] ResultSrc,   // select alu result or memory data
     output logic       MemWrite,    // data memory write enable
     output logic [1:0] PCSrc,       // select next PC source
@@ -32,9 +33,10 @@ module controller (
         .Overflow(Overflow),
         .Carry(Carry),
         .OpF(OpF),
+        .predictionE(predictionE),
 
         .Branch_taken(Branch_taken),
-        .Jump(Jump),
+        .FlushE(FlushE),
         .ResultSrc(ResultSrc),
         .MemWrite(MemWrite),
         .PCSrc(PCSrc),

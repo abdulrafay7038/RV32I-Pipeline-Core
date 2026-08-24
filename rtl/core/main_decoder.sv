@@ -6,7 +6,10 @@ module main_decoder (
     input  logic       Overflow,
     input  logic       Carry,
     input  logic [6:0] OpF,
-    output logic Branch_taken, Jump, 
+    input  logic [1:0] predictionE,
+    
+    output logic       Branch_taken,
+    output logic       FlushE,
     output logic [1:0] ResultSrc,
     output logic       MemWrite,
     output logic [1:0] PCSrc,
@@ -31,12 +34,15 @@ typedef enum logic [6:0] {
 
 opcode_t Opcode;
 assign Opcode = opcode_t'(Op);
+logic  [1:0] PCSrc1;
+logic  missprediction;
+logic  Jump;
 always_comb begin
     // default values
     RegWrite  = 1'b0;
     ImmSrc    = 3'b000;
     ALUSrc    = 3'b000;
-    PCSrc     = 2'b00;
+    PCSrc1    = 2'b00;
     MemWrite  = 1'b0;
     ResultSrc = 2'b00;
     ALUOp     = 2'b00;
@@ -61,7 +67,7 @@ always_comb begin
         OP_JALR: begin
             RegWrite = 1'b1;
             ALUSrc   = 3'b100;
-            PCSrc    = 2'b10;
+            PCSrc1   = 2'b10;
             ALUOp    = 2'b10;
             ResultSrc = 2'b10;
             Jump = 1;
@@ -96,14 +102,14 @@ always_comb begin
                 3'b111:  Branch_taken = Carry;                  // BGEU
                 default: Branch_taken = 1'b0;
             endcase
-            PCSrc  = Branch_taken? 2'b01: 2'b00;
+            PCSrc1  = Branch_taken? 2'b01: 2'b00;
         end
 
         // JAL
         OP_JAL: begin
             RegWrite  =  1'b1;
             ImmSrc    =  3'b011;
-            PCSrc     =  2'b01;
+            PCSrc1    =  2'b01;
             ResultSrc = 2'b10;
             Jump = 1;
         end
@@ -130,8 +136,13 @@ always_comb begin
     endcase
         // Branch predictor controls PC selection for fetched branches
         if (OpF == OP_BRANCH) begin
-            PCSrc = 2'b11;
+            PCSrc1 = 2'b11;
         end
 end
+
+   
+    assign missprediction = ((Op == 7'b1100011) && (predictionE[1]!= Branch_taken));
+    assign FlushE = missprediction || Jump;
+    assign PCSrc  = (FlushE ||(OpF == 7'b1100011))? PCSrc1 : 2'b00;
 
 endmodule : main_decoder
