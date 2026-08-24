@@ -23,7 +23,8 @@ module top (
     logic       RegWrite;    // register file write enable
     logic [2:0] ImmSrc;      // immediate format selector
     logic [3:0] AlUControl;  // alu operation selector
-    logic Branch_taken, Jump;
+    logic [1:0] predictionE; // prediction made for the branch being executed
+    logic Branch_taken, FlushE;
     
     // controller: generates control signals based on instruction opcode and alu flags
     (* DONT_TOUCH = "true" *) controller Controller(
@@ -35,11 +36,13 @@ module top (
         .Negative(Negative),
         .Overflow(Overflow),
         .Carry(Carry),
+
+        .Branch_taken(Branch_taken),
+        .FlushE(FlushE),
         .ResultSrc(ResultSrc),
         .MemWrite(MemWrite),
         .PCSrc(PCSrc),
-        .Branch_taken(Branch_taken),
-        .Jump(Jump),
+        .predictionE(predictionE),
         .ALUSrc(ALUSrc),
         .RegWrite(RegWrite),
         .ImmSrc(ImmSrc),
@@ -59,7 +62,8 @@ module top (
         .MemWriteE(MemWrite),
         .ResultSrcE(ResultSrc),
         .Branch_taken(Branch_taken),
-        .JumpE(Jump),
+        .FlushE(FlushE),
+        .predictionE(predictionE),
         .OpF(OpF),
         .Op(Op),
         .funct3(funct3),
