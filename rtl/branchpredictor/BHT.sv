@@ -46,8 +46,11 @@ module bht(
     
     //Read Interface
     always_comb begin
-        predictionF    = bht[indexF][1:0];
         hit            = (tagF == stored_tag) && valid;
+        // A tag miss is predicted not taken. Returning the stale counter
+        // on a miss makes execute believe a branch was predicted taken even
+        // though the BTB/BHT fetch path selected PC + 4.
+        predictionF    = hit ? bht[indexF][1:0] : 2'b01;
     end
 
 endmodule
