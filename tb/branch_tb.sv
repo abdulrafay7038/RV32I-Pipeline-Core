@@ -207,7 +207,7 @@ module branch_tb;
         else
             $fatal(1, "FAIL: TEST 13 - x11 expected 10, got %0d",
                    DUT.Datapath.Regfile.x[11]);
-        #300;
+        #200;
         // TEST 14 
 
         if (DUT.Datapath.Regfile.x[13] == 32'd1)
@@ -221,7 +221,7 @@ module branch_tb;
         else
             $fatal(1, "FAIL: TEST 14 - x14 expected 10, got %0d",
                    DUT.Datapath.Regfile.x[14]);
-        #100;
+        #80;
         // TEST 15 
 
         if (DUT.Datapath.Regfile.x[16] == 32'd0)
@@ -249,7 +249,7 @@ module branch_tb;
         else
             $fatal(1, "FAIL: TEST 16 - x20 expected 1, got %0d",
                    DUT.Datapath.Regfile.x[20]);
-        #80;
+        #50;
         // TEST 17 
 
         if (DUT.Datapath.Regfile.x[24] == 32'd1)
@@ -257,7 +257,7 @@ module branch_tb;
         else
             $fatal(1, "FAIL: TEST 17 - x24 expected 1, got %0d",
                    DUT.Datapath.Regfile.x[24]);
-        #80;
+        #50;
         // TEST 18
 
         if (DUT.Datapath.Regfile.x[27] == 32'd1)
@@ -271,7 +271,7 @@ module branch_tb;
         else
             $fatal(1, "FAIL: TEST 18 - x30 expected 30, got %0d",
                    DUT.Datapath.Regfile.x[30]);
-        #80;
+        #100;
         // TEST 19 
 
         if (DUT.Datapath.Regfile.x[28] == 32'd1)
@@ -279,7 +279,7 @@ module branch_tb;
         else
             $fatal(1, "FAIL: TEST 19 - x28 expected 1, got %0d",
                    DUT.Datapath.Regfile.x[28]);
-        #80;
+        #100;
         // TEST 20 
 
         if (DUT.Datapath.Regfile.x[30] == 32'd1234)

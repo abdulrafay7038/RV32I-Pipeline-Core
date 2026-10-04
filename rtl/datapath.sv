@@ -188,9 +188,13 @@ module datapath (
     always_comb begin
         // Next PC selection
         case(PCSrcE)
-            2'b00: PCNextF = PCPlus4F;
+            // A not-taken branch that was predicted taken must recover to
+            // the fall-through of the executing branch, not PCF + 4. PCF
+            // already points at the incorrectly fetched predicted target.
+            2'b00: PCNextF = FlushE ? PCPlus4E : PCPlus4F;
             2'b01: PCNextF = PCTargetE;
-            2'b10: PCNextF = ALUResultE;
+            // RV32I JALR target addresses always clear bit zero.
+            2'b10: PCNextF = {ALUResultE[31:1], 1'b0};
             2'b11: PCNextF = BranchPC;    //from branch predictor
             default: PCNextF = PCPlus4F;
         endcase

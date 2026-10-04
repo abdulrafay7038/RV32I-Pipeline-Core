@@ -134,15 +134,21 @@ always_comb begin
             // defaults already assigned
         end
     endcase
-        // Branch predictor controls PC selection for fetched branches
-        if (OpF == OP_BRANCH) begin
-            PCSrc1 = 2'b11;
-        end
 end
 
    
     assign missprediction = ((Op == 7'b1100011) && (predictionE[1]!= Branch_taken));
     assign FlushE = missprediction || Jump;
-    assign PCSrc  = (FlushE ||(OpF == 7'b1100011))? PCSrc1 : 2'b00;
+    // An executing control-flow instruction always has priority over a
+    // younger fetched branch.  The predictor may select the next PC only
+    // when execute does not need to redirect or flush fetch.
+    always_comb begin
+        if (FlushE)
+            PCSrc = PCSrc1;
+        else if (OpF == OP_BRANCH)
+            PCSrc = 2'b11;
+        else
+            PCSrc = 2'b00;
+    end
 
 endmodule : main_decoder
