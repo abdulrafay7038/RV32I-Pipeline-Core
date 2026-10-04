@@ -70,3 +70,8 @@ vsim -c -suppress 7061 -lib work mergesort_tb -do 'run -all; quit -f'
 ```
 
 `factorial_tb` checks the result after 3,000 simulation time units and has no `$finish`, so its command runs to 4,000 before exiting. The other benches finish themselves when their checks complete.
+
+## Authors
+
+- Abdul Rafay
+- Haiqua Ghaffar
