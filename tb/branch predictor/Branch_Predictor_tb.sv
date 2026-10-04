@@ -31,63 +31,36 @@ module Branch_Predictor_tb;
 task test(  logic [31:0] pc_in,    target_address,
             logic [ 1:0] predic_f, updated_prediction,                
             logic        b_branch, btb_h, bht_h, m1_s);
-    
-    assert(PCin == pc_in) else begin
-        $display("Outgoing pc address is wrong");
-        $display("Expected value = %h", pc_in);
-        $display("Actual value   = %h", PCin);
-        //$stop;
-    end
 
-    assert(TargetAddress == target_address) else begin
-        $display("Predicted target address for fetched instruction is wrong.");
-        $display("Expected value = %h", target_address);
-        $display("Actual value   = %h", TargetAddress);
-        //$stop;
-    end
+    if (PCin !== pc_in)
+        $fatal(1, "PCin mismatch: expected %h, got %h", pc_in, PCin);
 
-    assert(predictionF == predic_f) else begin
-        $display("Prediction for fetched instruction is wrong.");
-        $display("Expected value = %h", predic_f);
-        $display("Actual value   = %h", predictionF);
-        //$stop;
-    end
+    // The BTB target is don't-care on a miss; the fetch path uses it only
+    // when the BTB and BHT both hit and the direction predicts taken.
+    if (btb_h && (TargetAddress !== target_address))
+        $fatal(1, "TargetAddress mismatch: expected %h, got %h",
+               target_address, TargetAddress);
 
-    assert(UpdatedPrediction == updated_prediction) else begin
-        $display("Updated prediction is wrong.");
-        $display("Expected value = %h", updated_prediction);
-        $display("Actual value   = %h", UpdatedPrediction);
-        //$stop;
-    end
+    if (predictionF !== predic_f)
+        $fatal(1, "predictionF mismatch: expected %b, got %b",
+               predic_f, predictionF);
 
-    assert(Branchop == b_branch) else begin
-        $display("Branch op is wrong.");
-        $display("Expected value = %h", b_branch);
-        $display("Actual value   = %h", Branchop);
-        //$stop;
-    end
+    if (UpdatedPrediction !== updated_prediction)
+        $fatal(1, "UpdatedPrediction mismatch: expected %b, got %b",
+               updated_prediction, UpdatedPrediction);
 
-    assert(btb_hit == btb_h) else begin
-        $display("BTB's hit is wrong.");
-        $display("Expected value = %h", btb_h);
-        $display("Actual value   = %h", btb_hit);
-        //$stop;
-    end
+    if (Branchop !== b_branch)
+        $fatal(1, "Branchop mismatch: expected %b, got %b", b_branch, Branchop);
 
-    assert(bht_hit == bht_h) else begin
-        $display("BHT's hit is wrong.");
-        $display("Expected value = %h", bht_h);
-        $display("Actual value   = %h", bht_hit);
-        //$stop;
-    end
-    
-    assert(m1_sel == m1_s) else begin
-        $display("The select signal of m1 is wrong.");
-        $display("Expected value = %h", m1_s);
-        $display("Actual value   = %h", m1_sel);
-        //$stop;
-    end
-        
+    if (btb_hit !== btb_h)
+        $fatal(1, "BTB hit mismatch: expected %b, got %b", btb_h, btb_hit);
+
+    if (bht_hit !== bht_h)
+        $fatal(1, "BHT hit mismatch: expected %b, got %b", bht_h, bht_hit);
+
+    if (m1_sel !== m1_s)
+        $fatal(1, "m1_sel mismatch: expected %b, got %b", m1_s, m1_sel);
+
 endtask
 
 always #5 CLK = ~CLK;
