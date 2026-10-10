@@ -41,36 +41,6 @@ This is a non-privileged core. It does not implement privilege modes, CSRs, inte
 | `program/machinecode/` | Hex instruction and data images used by the testbenches. |
 | `docs/` | Datapath and controller diagrams. |
 
-## Simulating with QuestaSim
-
-Run these commands in PowerShell from the repository root. The simulator commands run from `questasim/` because the testbenches use paths relative to that directory.
-
-```powershell
-Set-Location questasim
-vlib work
-$rtlFiles = Get-ChildItem ..\rtl -Recurse -Filter *.sv | ForEach-Object FullName
-$tbFiles = Get-ChildItem ..\tb -Recurse -Filter *.sv | ForEach-Object FullName
-vlog -sv -work work @rtlFiles @tbFiles
-```
-
-Run the arithmetic, branch, load/store, and branch predictor tests with:
-
-```powershell
-foreach ($top in @('arithmetic_tb', 'branch_tb', 'loadstore_tb', 'Branch_Predictor_tb')) {
-    vsim -c -lib work $top -do 'run -all; quit -f'
-}
-```
-
-The factorial, bubble sort, and merge sort benches initialize the stack pointer through a hierarchical testbench write. With QuestaSim 2024.1, suppress its `vopt-7061` diagnostic for those runs:
-
-```powershell
-vsim -c -suppress 7061 -lib work factorial_tb -do 'run 4000; quit -f'
-vsim -c -suppress 7061 -lib work bubblesort_tb -do 'run -all; quit -f'
-vsim -c -suppress 7061 -lib work mergesort_tb -do 'run -all; quit -f'
-```
-
-`factorial_tb` checks the result after 3,000 simulation time units and has no `$finish`, so its command runs to 4,000 before exiting. The other benches finish themselves when their checks complete.
-
 ## Authors
 
 - Abdul Rafay
